@@ -4,7 +4,6 @@ import gleam/dict
 import gleam/int
 import gleam/list
 import gleam/result
-import gleam/set
 import gleam/string
 import gleamy/priority_queue
 import pocket_watch
@@ -26,7 +25,7 @@ pub fn pt_1(input: List(vec2.Vec2)) {
       [Next(0, manhattan_distance(#(0, 0), size), #(0, 0))],
       fn(a, b) { int.compare(a.score, b.score) },
     )
-  find_path(q, size, map, set.new())
+  find_path(q, size, map)
   |> result.unwrap(-1)
 }
 
@@ -41,7 +40,7 @@ pub fn pt_2(input: List(vec2.Vec2)) {
 
   list.fold_until(input, #(grid, Error(Nil)), fn(grid, position) {
     let map = dict.insert(grid.0, position, "#")
-    case find_path(initial_queue, size, map, set.new()) {
+    case find_path(initial_queue, size, map) {
       Ok(_) -> list.Continue(#(map, grid.1))
       Error(_) -> list.Stop(#(map, Ok(position)))
     }
@@ -67,12 +66,7 @@ pub type Next {
   Next(length: Int, score: Int, position: vec2.Vec2)
 }
 
-fn find_path(
-  queue,
-  goal: Vec2,
-  blocks: dict.Dict(Vec2, String),
-  visited: set.Set(Vec2),
-) {
+fn find_path(queue, goal: Vec2, blocks: dict.Dict(Vec2, String)) {
   case priority_queue.pop(queue) {
     Error(_) -> Error(Nil)
     Ok(#(Next(..) as head, remaining)) -> {
@@ -84,11 +78,7 @@ fn find_path(
             [#(0, 1), #(1, 0), #(-1, 0), #(0, -1)]
             |> list.fold(remaining, fn(q, direction) {
               let next_pos = vec2.translate(head.position, direction)
-              use <- bool.guard(
-                when: !is_free(blocks, next_pos)
-                  || set.contains(visited, next_pos),
-                return: q,
-              )
+              use <- bool.guard(when: !is_free(blocks, next_pos), return: q)
               priority_queue.push(
                 q,
                 Next(
@@ -102,8 +92,7 @@ fn find_path(
           find_path(
             updated_queue,
             goal,
-            blocks,
-            visited |> set.insert(head.position),
+            blocks |> dict.insert(head.position, "#"),
           )
         }
       }
