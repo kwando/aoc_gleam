@@ -22,7 +22,7 @@ pub fn pt_1(input: List(vec2.Vec2)) {
 
   let q =
     priority_queue.from_list(
-      [Next(0, manhattan_distance(#(0, 0), size), #(0, 0))],
+      [Next(length: 0, score: 0, position: #(0, 0))],
       fn(a, b) { int.compare(a.score, b.score) },
     )
   find_path(q, size, map)
@@ -34,7 +34,7 @@ pub fn pt_2(input: List(vec2.Vec2)) {
   let grid = empty_grid(size.0, size.1)
   let initial_queue =
     priority_queue.from_list(
-      [Next(0, manhattan_distance(#(0, 0), size), #(0, 0))],
+      [Next(length: 0, score: 0, position: #(0, 0))],
       fn(a, b) { int.compare(a.score, b.score) },
     )
 
@@ -63,7 +63,7 @@ fn empty_grid(rows: Int, cols: Int) {
 }
 
 pub type Next {
-  Next(length: Int, score: Int, position: vec2.Vec2)
+  Next(score: Int, length: Int, position: vec2.Vec2)
 }
 
 fn find_path(queue, goal: Vec2, blocks: dict.Dict(Vec2, String)) {
@@ -82,7 +82,7 @@ fn find_path(queue, goal: Vec2, blocks: dict.Dict(Vec2, String)) {
               priority_queue.push(
                 q,
                 Next(
-                  head.length + 1,
+                  length: head.length + 1,
                   score: head.length + 1 + manhattan_distance(next_pos, goal),
                   position: next_pos,
                 ),
