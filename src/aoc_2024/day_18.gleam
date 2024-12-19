@@ -1,5 +1,4 @@
 import aoc/vec2.{type Vec2}
-import gleam/bool
 import gleam/dict
 import gleam/int
 import gleam/list
@@ -70,23 +69,27 @@ fn find_path(queue, goal: Vec2, blocks: dict.Dict(Vec2, String)) {
   case priority_queue.pop(queue) {
     Error(_) -> Error(Nil)
     Ok(#(Next(..) as head, remaining)) -> {
-      //io.debug(head)
       case head.position == goal {
         True -> Ok(head.length)
         False -> {
           let updated_queue =
             [#(0, 1), #(1, 0), #(-1, 0), #(0, -1)]
-            |> list.fold(remaining, fn(q, direction) {
+            |> list.fold(remaining, fn(queue, direction) {
               let next_pos = vec2.translate(head.position, direction)
-              use <- bool.guard(when: !is_free(blocks, next_pos), return: q)
-              priority_queue.push(
-                q,
-                Next(
-                  length: head.length + 1,
-                  score: head.length + 1 + manhattan_distance(next_pos, goal),
-                  position: next_pos,
-                ),
-              )
+              case is_free(blocks, next_pos) {
+                True ->
+                  priority_queue.push(
+                    queue,
+                    Next(
+                      length: head.length + 1,
+                      score: head.length
+                        + 1
+                        + manhattan_distance(next_pos, goal),
+                      position: next_pos,
+                    ),
+                  )
+                False -> queue
+              }
             })
 
           find_path(
