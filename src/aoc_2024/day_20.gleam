@@ -5,35 +5,23 @@ import gleam/int
 import gleam/list
 import gleam/option
 import gleam/string
-import gleamy/priority_queue
 
 pub fn pt_1(input: ParseResult) {
   let map = input.0
   let assert Ok([start]) = dict.get(input.1, "S")
   let assert Ok([goal]) = dict.get(input.1, "E")
-  let q =
-    priority_queue.from_list(
-      [Next(length: 0, score: 0, position: start, path: [start])],
-      fn(a, b) { int.compare(a.score, b.score) },
-    )
 
-  let assert Ok(res) = find_path(q, goal, map)
-
-  count_cheats(res.path, cheat_duration: 2, threshold: 100)
+  let assert Ok(path) = dfs_search(start, goal, map, [])
+  count_cheats(path, cheat_duration: 2, threshold: 100)
 }
 
 pub fn pt_2(input: ParseResult) {
   let map = input.0
   let assert Ok([start]) = dict.get(input.1, "S")
   let assert Ok([goal]) = dict.get(input.1, "E")
-  let q =
-    priority_queue.from_list(
-      [Next(length: 0, score: 0, position: start, path: [start])],
-      fn(a, b) { int.compare(a.score, b.score) },
-    )
 
-  let assert Ok(res) = find_path(q, goal, map)
-  count_cheats(res.path, cheat_duration: 20, threshold: 100)
+  let assert Ok(path) = dfs_search(start, goal, map, [])
+  count_cheats(path, cheat_duration: 20, threshold: 100)
 }
 
 fn count_cheats(path, cheat_duration max_distance: Int, threshold threshold) {
@@ -102,40 +90,28 @@ pub type Next {
 
 const directions = [#(0, 1), #(1, 0), #(-1, 0), #(0, -1)]
 
-fn find_path(queue, goal: Vec2, blocks: dict.Dict(Vec2, String)) {
-  case priority_queue.pop(queue) {
-    Error(_) -> Error(Nil)
-    Ok(#(Next(..) as head, remaining)) -> {
-      case head.position == goal {
-        True -> Ok(head)
-        False -> {
-          let updated_queue =
-            list.fold(directions, remaining, fn(queue, direction) {
-              let next_pos = vec2.translate(head.position, direction)
-              case is_free(blocks, next_pos) {
-                True ->
-                  priority_queue.push(
-                    queue,
-                    Next(
-                      length: head.length + 1,
-                      score: head.length
-                        + 1
-                        + manhattan_distance(next_pos, goal),
-                      position: next_pos,
-                      path: [next_pos, ..head.path],
-                    ),
-                  )
-                False -> queue
-              }
-            })
+fn dfs_search(
+  position: Vec2,
+  goal: Vec2,
+  blocks: dict.Dict(Vec2, String),
+  path: List(Vec2),
+) {
+  case position == goal {
+    True -> Ok(list.reverse([goal, ..path]))
+    False -> {
+      let assert [next] =
+        list.filter_map(directions, fn(dir) {
+          let next_pos = vec2.translate(position, dir)
+          case is_free(blocks, next_pos) {
+            True -> Ok(next_pos)
+            False -> Error(Nil)
+          }
+        })
 
-          find_path(
-            updated_queue,
-            goal,
-            blocks |> dict.insert(head.position, "#"),
-          )
-        }
-      }
+      dfs_search(next, goal, blocks |> dict.insert(position, "#"), [
+        position,
+        ..path
+      ])
     }
   }
 }
