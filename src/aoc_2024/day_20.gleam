@@ -1,4 +1,5 @@
 import aoc/vec2.{type Vec2, manhattan_distance}
+import gleam/bool
 import gleam/dict
 import gleam/int
 import gleam/list
@@ -57,30 +58,15 @@ fn count_cheats_loop(
     [pos, ..rest] -> {
       count_cheats_loop(
         rest,
-        {
-          // find positions closer to the goal we could jump to
-          let options =
-            list.filter(rest, fn(p) {
-              manhattan_distance(pos, p) <= max_distance
-            })
-          use count, check_pos <- list.fold(options, count)
-          let assert Ok(steps_from_here) = dict.get(distances, pos)
-          case dict.get(distances, check_pos) {
-            Ok(value) -> {
-              let saved_steps =
-                steps_from_here
-                - int.min(
-                  value + manhattan_distance(pos, check_pos),
-                  steps_from_here,
-                )
+        count
+          + {
+          use cheat_position <- list.count(rest)
+          let cheat_distance = manhattan_distance(pos, cheat_position)
+          use <- bool.guard(when: cheat_distance > max_distance, return: False)
 
-              case saved_steps >= threshold {
-                True -> count + 1
-                False -> count
-              }
-            }
-            Error(Nil) -> count
-          }
+          let assert Ok(remaining_steps) = dict.get(distances, pos)
+          let assert Ok(steps_after_cheat) = dict.get(distances, cheat_position)
+          remaining_steps - steps_after_cheat - cheat_distance >= threshold
         },
         distances,
         max_distance,
