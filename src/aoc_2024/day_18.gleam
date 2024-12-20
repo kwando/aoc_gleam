@@ -1,4 +1,4 @@
-import aoc/vec2.{type Vec2}
+import aoc/vec2.{type Vec2, manhattan_distance}
 import gleam/dict
 import gleam/int
 import gleam/list
@@ -48,11 +48,6 @@ pub fn pt_2(input: List(vec2.Vec2)) {
     int.to_string(coord.0) <> "," <> int.to_string(coord.1)
   })
   |> result.unwrap("failure")
-}
-
-fn manhattan_distance(position: Vec2, target: Vec2) {
-  int.absolute_value(position.0 - target.0)
-  + int.absolute_value(position.1 - target.1)
 }
 
 fn empty_grid(rows: Int, cols: Int) {
