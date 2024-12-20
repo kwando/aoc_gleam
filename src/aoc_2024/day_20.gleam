@@ -1,4 +1,4 @@
-import aoc/vec2.{type Vec2, manhattan_distance, translate}
+import aoc/vec2.{type Vec2, manhattan_distance}
 import gleam/dict
 import gleam/int
 import gleam/list
@@ -18,18 +18,7 @@ pub fn pt_1(input: ParseResult) {
 
   let assert Ok(res) = find_path(q, goal, map)
 
-  let #(length_left, _) =
-    list.fold(res.path |> list.reverse, #(dict.new(), 0), fn(acc, pos) {
-      #(dict.insert(acc.0, pos, acc.1), acc.1 + 1)
-    })
-
-  fold_path(res.path, dict.new(), length_left, 2)
-  |> dict.fold(0, fn(agg, key, value) {
-    case key {
-      key if key >= 100 -> agg + value
-      _ -> agg
-    }
-  })
+  count_cheats(res.path, cheat_duration: 2, threshold: 100)
 }
 
 pub fn pt_2(input: ParseResult) {
@@ -43,26 +32,30 @@ pub fn pt_2(input: ParseResult) {
     )
 
   let assert Ok(res) = find_path(q, goal, map)
+  count_cheats(res.path, cheat_duration: 20, threshold: 100)
+}
 
-  let #(length_left, _) =
-    list.fold(res.path |> list.reverse, #(dict.new(), 0), fn(acc, pos) {
+fn count_cheats(path, cheat_duration max_distance: Int, threshold threshold) {
+  // calculate the distance to goal from every position on the path
+  let #(distances, _) =
+    list.fold(path |> list.reverse, #(dict.new(), 0), fn(acc, pos) {
       #(dict.insert(acc.0, pos, acc.1), acc.1 + 1)
     })
 
-  fold_path(res.path, dict.new(), length_left, 20)
-  |> dict.fold(0, fn(agg, key, value) {
-    case key {
-      key if key >= 100 -> agg + value
-      _ -> agg
-    }
-  })
+  count_cheats_loop(path, 0, distances, max_distance, threshold)
 }
 
-fn fold_path(path, count, length_left, max_distance) {
+fn count_cheats_loop(
+  path,
+  count: Int,
+  distances,
+  cheat_duration max_distance: Int,
+  threshold threshold,
+) {
   case path {
     [] -> count
     [pos, ..rest] -> {
-      fold_path(
+      count_cheats_loop(
         rest,
         {
           // find positions closer to the goal we could jump to
@@ -71,8 +64,8 @@ fn fold_path(path, count, length_left, max_distance) {
               manhattan_distance(pos, p) <= max_distance
             })
           use count, check_pos <- list.fold(options, count)
-          let assert Ok(steps_from_here) = dict.get(length_left, pos)
-          case dict.get(length_left, check_pos) {
+          let assert Ok(steps_from_here) = dict.get(distances, pos)
+          case dict.get(distances, check_pos) {
             Ok(value) -> {
               let saved_steps =
                 steps_from_here
@@ -81,13 +74,17 @@ fn fold_path(path, count, length_left, max_distance) {
                   steps_from_here,
                 )
 
-              dict.upsert(count, saved_steps, fn(x) { option.unwrap(x, 0) + 1 })
+              case saved_steps >= threshold {
+                True -> count + 1
+                False -> count
+              }
             }
             Error(Nil) -> count
           }
         },
-        length_left,
+        distances,
         max_distance,
+        threshold,
       )
     }
   }
