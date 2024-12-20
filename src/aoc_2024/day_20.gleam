@@ -99,6 +99,7 @@ fn dfs_search(
   case position == goal {
     True -> Ok(list.reverse([goal, ..path]))
     False -> {
+      // there should only be one option..
       let assert [next] =
         list.filter_map(directions, fn(dir) {
           let next_pos = vec2.translate(position, dir)
