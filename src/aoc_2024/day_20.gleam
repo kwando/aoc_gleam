@@ -1,13 +1,9 @@
 import aoc/vec2.{type Vec2, manhattan_distance, translate}
-import gleam/bool
 import gleam/dict
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/option
-import gleam/set
 import gleam/string
-import gleamy/map
 import gleamy/priority_queue
 
 pub fn pt_1(input: ParseResult) {
@@ -22,27 +18,12 @@ pub fn pt_1(input: ParseResult) {
 
   let assert Ok(res) = find_path(q, goal, map)
 
-  let #(length_left, steps) =
+  let #(length_left, _) =
     list.fold(res.path |> list.reverse, #(dict.new(), 0), fn(acc, pos) {
       #(dict.insert(acc.0, pos, acc.1), acc.1 + 1)
     })
 
-  let directions = [#(0, 2), #(2, 0), #(-2, 0), #(0, -2)]
-
-  list.fold(res.path, dict.new(), fn(count, pos) {
-    list.fold(directions, count, fn(count, dir) {
-      let assert Ok(steps_from_here) = dict.get(length_left, pos)
-      case dict.get(length_left, pos |> translate(dir)) {
-        Ok(value) -> {
-          let saved_steps =
-            steps_from_here - int.min(value + 2, steps_from_here)
-
-          dict.upsert(count, saved_steps, fn(x) { option.unwrap(x, 0) + 1 })
-        }
-        Error(Nil) -> count
-      }
-    })
-  })
+  fold_path(res.path, dict.new(), length_left, 2)
   |> dict.fold(0, fn(agg, key, value) {
     case key {
       key if key >= 100 -> agg + value
@@ -51,24 +32,65 @@ pub fn pt_1(input: ParseResult) {
   })
 }
 
-const directions = [#(0, 1), #(1, 0), #(-1, 0), #(0, -1)]
+pub fn pt_2(input: ParseResult) {
+  let map = input.0
+  let assert Ok([start]) = dict.get(input.1, "S")
+  let assert Ok([goal]) = dict.get(input.1, "E")
+  let q =
+    priority_queue.from_list(
+      [Next(length: 0, score: 0, position: start, path: [start])],
+      fn(a, b) { int.compare(a.score, b.score) },
+    )
 
-fn candidates(positions: List(Vec2), map, result: set.Set(Vec2)) {
-  case positions {
-    [] -> result
-    [pos, ..rest] -> {
-      candidates(rest, map, {
-        use acc, dir <- list.fold(directions, result)
-        let check_pos = translate(pos, dir)
-        use <- bool.guard(when: is_free(map, check_pos), return: acc)
-        result |> set.insert(check_pos)
-      })
+  let assert Ok(res) = find_path(q, goal, map)
+
+  let #(length_left, _) =
+    list.fold(res.path |> list.reverse, #(dict.new(), 0), fn(acc, pos) {
+      #(dict.insert(acc.0, pos, acc.1), acc.1 + 1)
+    })
+
+  fold_path(res.path, dict.new(), length_left, 20)
+  |> dict.fold(0, fn(agg, key, value) {
+    case key {
+      key if key >= 100 -> agg + value
+      _ -> agg
     }
-  }
+  })
 }
 
-pub fn pt_2(input: ParseResult) {
-  todo as "part 2 not implemented"
+fn fold_path(path, count, length_left, max_distance) {
+  case path {
+    [] -> count
+    [pos, ..rest] -> {
+      fold_path(
+        rest,
+        {
+          // find positions closer to the goal we could jump to
+          let options =
+            list.filter(rest, fn(p) {
+              manhattan_distance(pos, p) <= max_distance
+            })
+          use count, check_pos <- list.fold(options, count)
+          let assert Ok(steps_from_here) = dict.get(length_left, pos)
+          case dict.get(length_left, check_pos) {
+            Ok(value) -> {
+              let saved_steps =
+                steps_from_here
+                - int.min(
+                  value + manhattan_distance(pos, check_pos),
+                  steps_from_here,
+                )
+
+              dict.upsert(count, saved_steps, fn(x) { option.unwrap(x, 0) + 1 })
+            }
+            Error(Nil) -> count
+          }
+        },
+        length_left,
+        max_distance,
+      )
+    }
+  }
 }
 
 pub type ParseResult =
@@ -94,6 +116,8 @@ pub fn parse(input: String) -> ParseResult {
 pub type Next {
   Next(score: Int, length: Int, position: vec2.Vec2, path: List(Vec2))
 }
+
+const directions = [#(0, 1), #(1, 0), #(-1, 0), #(0, -1)]
 
 fn find_path(queue, goal: Vec2, blocks: dict.Dict(Vec2, String)) {
   case priority_queue.pop(queue) {

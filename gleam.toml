@@ -21,6 +21,7 @@ gleam_deque = ">= 1.0.0 and < 2.0.0"
 pocket_watch = ">= 1.0.0 and < 2.0.0"
 gleamy_structures = ">= 1.1.0 and < 2.0.0"
 gary = ">= 1.1.0 and < 2.0.0"
+rememo = ">= 3.2.0 and < 4.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
@@ -73,3 +74,9 @@ pt_2 = 236555995274861
 [gladvent.2024.18]
 pt_2 = "46,28"
 pt_1 = 308
+[gladvent.2024.19]
+pt_1 = 340
+pt_2 = 717561822679428
+[gladvent.2024.20]
+pt_1 = 1399
+pt_2 = 994807
