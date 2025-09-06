@@ -22,6 +22,7 @@ pocket_watch = ">= 1.0.0 and < 2.0.0"
 gleamy_structures = ">= 1.1.0 and < 2.0.0"
 gary = ">= 1.1.0 and < 2.0.0"
 rememo = ">= 3.2.0 and < 4.0.0"
+gleam_erlang = ">= 0.33.0 and < 1.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
@@ -80,3 +81,5 @@ pt_2 = 717561822679428
 [gladvent.2024.20]
 pt_1 = 1399
 pt_2 = 994807
+[gladvent.2024.22]
+pt_1 = 15613157363
