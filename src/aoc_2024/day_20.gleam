@@ -1,7 +1,6 @@
 import aoc/vec2.{type Vec2, manhattan_distance}
 import gleam/bool
 import gleam/dict
-import gleam/int
 import gleam/list
 import gleam/option
 import gleam/string
