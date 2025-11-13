@@ -1,8 +1,8 @@
-import gleam/erlang/process
+import gleam/dict
 import gleam/int.{bitwise_exclusive_or as mix}
 import gleam/list
+import gleam/option
 import gleam/string
-import pocket_watch
 
 pub fn pt_1(buyers: List(Int)) {
   use sum, secret <- list.fold(buyers, 0)
@@ -10,35 +10,17 @@ pub fn pt_1(buyers: List(Int)) {
 }
 
 pub fn pt_2(buyers: List(Int)) {
-  use <- pocket_watch.simple("pt2")
+  let buyers = [1, 2, 3, 2024]
+}
 
-  let sequences = {
-    use <- pocket_watch.simple("generate sequences")
-    every_sequence([], fn(count, seq) { [seq, ..count] })
-  }
-  //let buyers = [1, 2, 3, 2024]
-  let chunks = sequences |> list.sized_chunk(list.length(sequences) / 8)
-  list.length(chunks)
-  |> echo as "chunks"
-
-  let tasks =
-    list.map(chunks, fn(chunk) {
-      let sub = process.new_subject()
-      process.start(
-        fn() { process.send(sub, max_sellprice(buyers, chunk)) },
-        True,
-      )
-      sub
-    })
-
-  list.fold(tasks, #(0, []), fn(current_max, task) {
-    let result = process.receive_forever(task)
-    case result.0 > current_max.0 {
-      True -> result
-      False -> current_max
-    }
-  })
-  |> echo
+fn sell_prices(
+  secret,
+  n: Int,
+  current_price: Int,
+  sequence: option.Option(#(Int, Int, Int, Int)),
+  result: dict.Dict(#(Int, Int, Int, Int), Int),
+) {
+  todo
 }
 
 fn max_sellprice(

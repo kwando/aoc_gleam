@@ -23,63 +23,90 @@ gleamy_structures = ">= 1.1.0 and < 2.0.0"
 gary = ">= 1.1.0 and < 2.0.0"
 rememo = ">= 3.2.0 and < 4.0.0"
 gleam_erlang = ">= 0.33.0 and < 1.0.0"
+parallel_map = ">= 2.1.0 and < 3.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
 
+[gladvent.2024.1]
+pt_1 = 1506483
+pt_2 = 23126924
+
+[gladvent.2024.2]
+pt_1 = 411
+pt_2 = 465
+
 [gladvent.2024.3]
 pt_1 = 167090022
 pt_2 = 89823704
+
 [gladvent.2024.4]
 pt_1 = 2593
 pt_2 = 1950
+
 [gladvent.2024.5]
 pt_1 = 5588
 pt_2 = 5331
+
 [gladvent.2024.6]
 pt_1 = 4778
 pt_2 = 1618
+
 [gladvent.2024.7]
 pt_1 = 2654749936343
 pt_2 = 124060392153684
+
 [gladvent.2024.8]
 pt_1 = 280
 pt_2 = 958
+
 [gladvent.2024.9]
 pt_1 = 6154342787400
 pt_2 = 6183632723350
+
 [gladvent.2024.10]
 pt_1 = 760
 pt_2 = 1764
+
 [gladvent.2024.11]
 pt_1 = 213625
 pt_2 = 252442982856820
+
 [gladvent.2024.12]
 pt_1 = 1450422
 pt_2 = 906606
+
 [gladvent.2024.13]
 pt_1 = 38714
 pt_2 = 74015623345775
+
 [gladvent.2024.14]
 pt_1 = 225810288
 pt_2 = 6752
+
 [gladvent.2024.15]
 pt_1 = 1511865
 pt_2 = 1519991
+
 [gladvent.2024.16]
 pt_1 = 94436
 pt_2 = 481
+
 [gladvent.2024.17]
 pt_1 = "1,7,6,5,1,0,5,0,7"
 pt_2 = 236555995274861
+
 [gladvent.2024.18]
 pt_2 = "46,28"
 pt_1 = 308
+
 [gladvent.2024.19]
 pt_1 = 340
 pt_2 = 717561822679428
+
 [gladvent.2024.20]
 pt_1 = 1399
 pt_2 = 994807
+
 [gladvent.2024.22]
 pt_1 = 15613157363
