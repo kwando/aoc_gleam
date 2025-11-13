@@ -1,12 +1,11 @@
-import gary
-import gary/array
 import gleam/bool
 import gleam/float
 import gleam/int
 import gleam/list
-import gleam/option
+import gleam/option.{Some}
 import gleam/result
 import gleam/string
+import iv
 
 pub fn pt_1(input: ParseResult) {
   let #(state, program) = input
@@ -28,8 +27,8 @@ pub fn run_program(state: State, program) {
 }
 
 fn get_instruction(program, pc: Int) {
-  case array.get(program, pc), array.get(program, pc + 1) {
-    Ok(option.Some(i)), Ok(option.Some(o)) -> Ok(#(i, o))
+  case iv.get(program, pc), iv.get(program, pc + 1) {
+    Ok(Some(i)), Ok(Some(o)) -> Ok(#(i, o))
     _, _ -> Error(Nil)
   }
 }
@@ -131,7 +130,7 @@ fn search_for_a(goal, acc, state, program) {
 
 pub fn pt_2(input: ParseResult) {
   input.1
-  |> array.to_list
+  |> iv.to_list
   |> list.map(fn(x) { option.unwrap(x, -1) })
   |> list.reverse
   |> search_for_a(list.range(0, 7), input.0, input.1)
@@ -143,7 +142,7 @@ pub type State {
 }
 
 pub type ParseResult =
-  #(State, gary.ErlangArray(option.Option(Int)))
+  #(State, iv.Array(option.Option(Int)))
 
 pub fn parse(input: String) -> ParseResult {
   let assert Ok(#(reg, instrs)) = string.split_once(input, "\n\n")
@@ -165,8 +164,8 @@ pub fn parse(input: String) -> ParseResult {
     })
   let instrs =
     instrs
-    |> list.map(option.Some)
-    |> array.from_list(default: option.None)
+    |> list.map(Some)
+    |> iv.from_list()
 
   #(State(a:, b:, c:, pc: 0, out: []), instrs)
 }
