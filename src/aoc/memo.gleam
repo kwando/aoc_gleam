@@ -10,7 +10,7 @@ pub fn create(callback) {
 
 pub fn new() {
   let unique_name = "memo-" <> monotonic_time() |> int.to_string
-  ets_new(atom.create_from_string(unique_name), [Set, Private])
+  ets_new(atom.create(unique_name), [Set, Private])
 }
 
 pub fn memoize(cache: EtsTable(a, b), argument: a, callback: fn() -> b) -> b {
