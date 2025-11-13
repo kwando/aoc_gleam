@@ -1,7 +1,7 @@
+import aoc/memo
 import gleam/bit_array
 import gleam/list
 import gleam/string
-import rememo/memo
 
 pub fn pt_1(input: ParseResult) {
   let #(towels, designs) = input
