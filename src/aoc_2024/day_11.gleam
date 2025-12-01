@@ -1,3 +1,4 @@
+import aoc/utils
 import gleam/dict
 import gleam/int
 import gleam/list
@@ -23,15 +24,15 @@ fn cached_blink(rocks: dict.Dict(Int, Int)) -> dict.Dict(Int, Int) {
   case h {
     0 -> dict.upsert(acc, 1, add_or_increment(_, value))
     n -> {
-      let assert Ok(digits) = int.digits(n, 10)
+      let assert Ok(digits) = utils.digits(n, 10)
       let number_of_digits = list.length(digits)
       case int.is_even(number_of_digits) {
         False -> dict.upsert(acc, h * 2024, add_or_increment(_, value))
         True -> {
           let assert Ok(left) =
-            int.undigits(list.take(digits, number_of_digits / 2), 10)
+            utils.undigits(list.take(digits, number_of_digits / 2), 10)
           let assert Ok(right) =
-            int.undigits(list.drop(digits, number_of_digits / 2), 10)
+            utils.undigits(list.drop(digits, number_of_digits / 2), 10)
 
           acc
           |> dict.upsert(left, add_or_increment(_, value))
