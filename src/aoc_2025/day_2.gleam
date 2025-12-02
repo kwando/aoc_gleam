@@ -1,5 +1,6 @@
 import gleam/int
 import gleam/list
+import gleam/set
 import gleam/string
 
 pub fn pt_1(input: ParseResult) {
@@ -20,30 +21,13 @@ pub fn pt_1(input: ParseResult) {
 }
 
 pub fn pt_2(input: ParseResult) {
-  input
-  |> list.fold(0, fn(sum, range) {
-    let silly_numbers =
-      list.filter(list.range(int.max(range.0, 10), range.1), is_silly)
-
-    sum + int.sum(silly_numbers)
+  possible_values()
+  |> set.fold(0, fn(sum, number) {
+    case list.any(input, fn(range) { number >= range.0 && number <= range.1 }) {
+      False -> sum
+      True -> sum + number
+    }
   })
-}
-
-fn is_silly(num: Int) {
-  let num_str = int.to_string(num)
-  let len = string.length(num_str)
-
-  list.range(1, len / 2)
-  |> list.map(string.slice(num_str, 0, _))
-  |> list.any(is_repeated(num_str, _))
-}
-
-fn is_repeated(input: String, seq: String) {
-  case input, string.starts_with(input, seq) {
-    "", _ -> True
-    _, True -> is_repeated(string.drop_start(input, string.length(seq)), seq)
-    _, False -> False
-  }
 }
 
 pub type ParseResult =
@@ -61,4 +45,34 @@ pub fn parse(input: String) -> ParseResult {
 
     #(start, end)
   })
+}
+
+fn possible_values() {
+  [
+    combinations(1, 9, 10),
+    combinations(10, 99, 100),
+    combinations(100, 999, 1000),
+    combinations(1000, 9999, 10_000),
+    combinations(10_000, 99_999, 100_000),
+    combinations(100_000, 999_999, 1_000_000),
+  ]
+  |> list.flatten
+  |> set.from_list
+}
+
+fn combinations(from, to, factor) {
+  let max_value = 100_000_000
+  list.range(from, to)
+  |> list.flat_map(fn(seed) { grow_until(seed, factor, seed, max_value, []) })
+}
+
+pub fn grow_until(acc, factor, seed, max_value, result) {
+  case acc < max_value {
+    True ->
+      grow_until(acc * factor + seed, factor, seed, max_value, [
+        acc * factor + seed,
+        ..result
+      ])
+    False -> result |> list.reverse
+  }
 }
