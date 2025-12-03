@@ -1,6 +1,5 @@
 import gleam/int
 import gleam/list
-import gleam/pair
 import gleam/string
 
 pub fn pt_1(banks: ParseResult) -> Int {
@@ -19,16 +18,17 @@ fn max_joltage_sum(banks: List(List(Int)), number_of_batteries: Int) -> Int {
 fn max_joltage(bank: List(Int), bank_size: Int) -> Int {
   list.range(bank_size, 1)
   |> list.fold(#(0, bank, list.length(bank)), fn(acc, batteries_needed) {
+    let #(voltage, batteries, batteries_left) = acc
     let #(max, rest, tail_length) =
       max_joltage_loop(
         acc.1,
         current_max: 0,
-        current_max_tail: acc.1,
-        current_max_tail_length: acc.2,
-        batteries_left: list.length(acc.1),
+        current_max_tail: batteries,
+        current_max_tail_length: batteries_left,
+        batteries_left:,
         batteries_needed:,
       )
-    #(acc.0 * 10 + max, rest, tail_length)
+    #(voltage * 10 + max, rest, tail_length)
   })
   |> fn(x) { x.0 }
 }
@@ -46,14 +46,14 @@ fn max_joltage_loop(
     False -> {
       case input {
         // we found a better batteru and still have batteries left
-        [a, ..rest] if a > current_max -> {
+        [joltage, ..current_max_tail] if joltage > current_max -> {
           max_joltage_loop(
-            rest,
-            a,
-            rest,
-            batteries_left,
-            batteries_left - 1,
-            batteries_needed,
+            current_max_tail,
+            current_max: joltage,
+            current_max_tail:,
+            current_max_tail_length: batteries_left - 1,
+            batteries_left: batteries_left - 1,
+            batteries_needed:,
           )
         }
         [_, ..rest] ->
