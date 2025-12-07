@@ -17,7 +17,8 @@ pub fn pt_2(input: ParseResult) {
 }
 
 fn merge_ranges(ranges: List(#(Int, Int))) {
-  list.sort(ranges, fn(r1, r2) {
+  ranges
+  |> list.sort(fn(r1, r2) {
     int.compare(r1.0, r2.0)
     |> order.break_tie(int.compare(r1.1, r2.1))
   })
